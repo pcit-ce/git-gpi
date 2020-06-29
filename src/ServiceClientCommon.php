@@ -24,15 +24,17 @@ trait ServiceClientCommon
      *
      * @throws \Exception
      */
-    private function successOrFailure(int $http_code, bool $throw = false): void
+    public function successOrFailure(int $http_code, bool $throw = false): void
     {
         $http_return_code = $this->curl->getCode();
 
-        $message = 'Http Response Code Is Not '.$http_return_code.' , code is '.$http_return_code;
+        $message = 'Http Response Code Is Not '.$http_code.' , code is '.$http_return_code;
 
-        if ($http_code !== $http_return_code) {
-            \Log::debug($message);
+        if ($http_code === $http_return_code) {
+            return;
         }
+
+        \Log::emergency($message);
 
         if ($throw) {
             throw new \Exception($message);
