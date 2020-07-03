@@ -7,7 +7,7 @@ namespace PCIT\GPI\Webhooks\Parser\UserBasicInfo;
 use PCIT\GPI\Webhooks\Context\Components\Kernel;
 
 /**
- * @property string                $login
+ * @property string                $login      username
  * @property int                   $id
  * @property string                $avatar_url
  * @property 'User'|'Organization' $type

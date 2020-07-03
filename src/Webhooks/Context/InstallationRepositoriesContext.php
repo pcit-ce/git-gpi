@@ -11,7 +11,7 @@ use PCIT\GPI\Webhooks\Parser\UserBasicInfo\Sender;
 /**
  * @property int               $installation_id
  * @property "added"|"removed" $action
- * @property array             $repo
+ * @property array             $repositories
  * @property Sender            $sender
  * @property Account           $account
  */
