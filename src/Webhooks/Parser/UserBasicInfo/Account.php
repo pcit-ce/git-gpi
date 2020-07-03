@@ -18,5 +18,7 @@ class Account extends Kernel
     public function __construct($obj, bool $org = false)
     {
         $this->org = $org;
+
+        parent::__construct($obj);
     }
 }
