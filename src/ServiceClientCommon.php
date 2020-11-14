@@ -8,9 +8,9 @@ use Curl\Curl;
 
 trait ServiceClientCommon
 {
-    protected $curl;
+    protected Curl $curl;
 
-    protected $api_url;
+    protected string $api_url;
 
     public function __construct(Curl $curl, string $api_url)
     {
@@ -21,18 +21,16 @@ trait ServiceClientCommon
 
     /**
      * @param $line
-     *
-     * @throws \Exception
      */
     public function successOrFailure(int $http_code, bool $throw = false): void
     {
         $http_return_code = $this->curl->getCode();
 
-        $message = 'Http Response Code Is Not '.$http_code.' , code is '.$http_return_code;
-
         if ($http_code === $http_return_code) {
             return;
         }
+
+        $message = 'Http Response Code Is Not '.$http_code.' , code is '.$http_return_code;
 
         \Log::emergency($message);
 

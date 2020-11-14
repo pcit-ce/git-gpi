@@ -17,7 +17,7 @@ abstract class ServerAbstract implements ServerInterface
 
     public function getEventType(string $event_header): string
     {
-        $event_type = explode(' ', \Request::getHeader($event_header))[0] ?? 'undefined';
+        $event_type = explode(' ', \Request::headers()->get($event_header))[0] ?? 'undefined';
 
         return strtolower($event_type);
     }
@@ -32,13 +32,13 @@ abstract class ServerAbstract implements ServerInterface
 
     public function verify(string $signature_header): void
     {
-        if (env('CI_WEBHOOKS_DEBUG', false)) {
+        if (config('git.webhooks.debug')) {
             return;
         }
 
-        $secret = env('CI_WEBHOOKS_TOKEN', null);
+        $secret = config('git.webhooks.token');
 
-        $signature = \Request::getHeader($signature_header);
+        $signature = \Request::headers()->get($signature_header);
 
         list($algo, $client_hash) = explode('=', $signature, 2);
 
@@ -57,48 +57,40 @@ abstract class ServerAbstract implements ServerInterface
      * @param $content
      *
      * @return bool|int
-     *
-     * @throws \Exception
      */
     public function pushCache(string $type, $content)
     {
-        return \Cache::store()->lpush($this->cache_key, json_encode([$this->git_type, $type, $content]));
+        return \Cache::lpush($this->cache_key, json_encode([$this->git_type, $type, $content]));
     }
 
     /**
      * 获取一条缓存数据.
      *
-     * @return string|false
-     *
-     * @throws \Exception
+     * @return false|string
      */
     public function getCache()
     {
-        return \Cache::store()->rPop($this->cache_key);
+        return \Cache::rPop($this->cache_key);
     }
 
     /**
      * 回滚.
      *
      * @return bool|int
-     *
-     * @throws \Exception
      */
     public function rollback(string $content)
     {
-        return \Cache::store()->lPush($this->cache_key, $content);
+        return \Cache::lPush($this->cache_key, $content);
     }
 
     /**
      * 处理成功，存入成功队列.
      *
      * @return bool|int
-     *
-     * @throws \Exception
      */
     public function pushSuccessCache(string $content)
     {
-        return \Cache::store()->lPush($this->cache_key.'_success', $content);
+        return \Cache::lPush($this->cache_key.'_success', $content);
     }
 
     /**
@@ -113,12 +105,10 @@ abstract class ServerAbstract implements ServerInterface
      * 处理失败，插入失败队列.
      *
      * @return bool|int
-     *
-     * @throws \Exception
      */
     public function pushErrorCache(string $content)
     {
-        return \Cache::store()->lPush($this->cache_key.'_error', $content);
+        return \Cache::lPush($this->cache_key.'_error', $content);
     }
 
     /**

@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace PCIT\GPI\Webhooks\Context;
 
 use PCIT\GPI\Webhooks\Context;
-use PCIT\GPI\Webhooks\Parser\UserBasicInfo\Owner;
+use PCIT\GPI\Webhooks\Context\Traits\ContextTrait;
 
 /**
- * @property int            $installation_id
- * @property int            $rid
- * @property string         $repo_full_name
- * @property Owner          $owner
+ * A Git branch or tag is deleted.
+ *
  * @property "branch"|"tag" $ref_type
- * @property string         $ref
  */
 class DeleteContext extends Context
 {
+    /**
+     * refs/heads/<branch>
+     * refs/tags/<tag>.
+     */
+    public string $ref;
+
+    public string $ref_type;
+
+    use ContextTrait;
 }

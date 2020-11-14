@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PCIT\GPI\Webhooks\Handler;
 
-use PCIT\Support\Git;
+use PCIT\GPI\Support\Git;
 
 /**
  * @see https://developer.github.com/webhooks/event-payloads/
@@ -22,34 +22,16 @@ class Kernel
         return 'PCIT\\'.Git::getClassName($git_type).'\\Webhooks\Handler\\';
     }
 
-    /**
-     * Action.
-     *
-     * created updated rerequested
-     *
-     * @throws \Exception
-     */
     public function check_run(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'CheckRun';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
-    /**
-     * Action.
-     *
-     * completed
-     *
-     * requested 用户推送分支，github post webhooks
-     *
-     * rerequested 用户点击了重新运行按钮
-     *
-     * @throws \Exception
-     */
     public function check_suite(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'CheckSuite';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function commit_comment(string $webhooks_content, string $git_type): void
@@ -58,30 +40,18 @@ class Kernel
 
     public function content_reference(string $webhooks_content, string $git_type): void
     {
-        $class = $this->getNamespace($git_type).'Content';
-        (new $class())->handle($webhooks_content);
+        $class = $this->getNamespace($git_type).'ContentReference';
+        $this->callHandler($class, $webhooks_content);
     }
 
-    /**
-     * Create "repository", "branch", or "tag".
-     *
-     * @return int
-     *
-     * @throws \Exception
-     */
-    public function create(string $webhooks_content, string $git_type)
+    public function create(string $webhooks_content, string $git_type): void
     {
     }
 
-    /**
-     * Delete tag or branch.
-     *
-     * @throws \Exception
-     */
     public function delete(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'Delete';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function deploy_key(string $webhooks_content, string $git_type): void
@@ -108,60 +78,29 @@ class Kernel
     {
     }
 
-    /**
-     * Any time a GitHub App is installed or uninstalled.
-     *
-     * action:
-     *
-     * created 用户点击安装按钮
-     *
-     * deleted 用户卸载了 GitHub Apps
-     *
-     * @see
-     *
-     * @throws \Exception
-     */
     public function installation(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'Installation';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
-    /**
-     * Any time a repository is added or removed from an installation.
-     *
-     * action:
-     *
-     * added 用户增加仓库
-     *
-     * removed 移除仓库
-     *
-     * @throws \Exception
-     */
     public function installation_repositories(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'InstallationRepositories';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
-    /**
-     * "created", "edited", or "deleted".
-     *
-     * @throws \Exception
-     */
     public function issue_comment(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'IssueComment';
-        (new $class())->handle($webhooks_content);
+
+        $this->callHandler($class, $webhooks_content);
     }
 
-    /**
-     * @throws \Exception
-     */
     public function issues(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'Issues';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function label(string $webhooks_content, string $git_type): void
@@ -172,11 +111,6 @@ class Kernel
     {
     }
 
-    /**
-     * action `added` `deleted` `edited` `removed`.
-     *
-     * @throws \Exception
-     */
     public function member(string $webhooks_content, string $git_type): void
     {
     }
@@ -213,7 +147,7 @@ class Kernel
     {
         $class = $this->getNamespace($git_type).'Ping';
 
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function project_card(string $webhooks_content, string $git_type): void
@@ -232,20 +166,10 @@ class Kernel
     {
     }
 
-    /**
-     * Action.
-     *
-     * "assigned", "unassigned", "review_requested", "review_request_removed",
-     * "labeled", "unlabeled", "opened", "synchronize", "edited", "closed", or "reopened"
-     *
-     * @return array|void
-     *
-     * @throws \Exception
-     */
-    public function pull_request(string $webhooks_content, string $git_type)
+    public function pull_request(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'PullRequest';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function pull_request_review(string $webhooks_content, string $git_type): void
@@ -256,17 +180,10 @@ class Kernel
     {
     }
 
-    /**
-     * push.
-     *
-     * 1. 首次推送到新分支，head_commit 为空
-     *
-     * @throws \Exception
-     */
     public function push(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'Push';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function release(string $webhooks_content, string $git_type): void
@@ -275,12 +192,14 @@ class Kernel
 
     public function repository_dispatch(string $webhooks_content, string $git_type): void
     {
+        $class = $this->getNamespace($git_type).'RepositoryDispatch';
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function repository(string $webhooks_content, string $git_type): void
     {
         $class = $this->getNamespace($git_type).'Repository';
-        (new $class())->handle($webhooks_content);
+        $this->callHandler($class, $webhooks_content);
     }
 
     public function repository_import(string $webhooks_content, string $git_type): void
@@ -313,18 +232,15 @@ class Kernel
 
     public function team_add(string $webhooks_content, string $git_type): void
     {
-        $obj = json_decode($webhooks_content);
-
-        $repository = $obj->repository;
-
-        $rid = $repository->id;
-        $username = $repository->owner->name;
-
-        $installation_id = $obj->installation->id ?? null;
     }
 
     public function watch(string $webhooks_content, string $git_type): void
     {
+    }
+
+    public function callHandler(string $class_name, string $webhooks_content): void
+    {
+        \call_user_func([new $class_name(), 'handle'], $webhooks_content);
     }
 
     public function __call($name, $args): void
